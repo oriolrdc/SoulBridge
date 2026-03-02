@@ -9,20 +9,30 @@ public class PlayerController : MonoBehaviour
     private CharacterController _controller;
     //Inputs
     private InputAction _moveAction;
+    private Vector2 _moveInput;
     private InputAction _lookAction;
+    private Vector2 _lookInput;
     private InputAction _changeAction;
     private InputAction _dashAction;
-    private Vector2 _lookInput;
-    private Vector2 _moveInput;
+    private InputAction _AttackAction;
     //Stats
     [SerializeField] private float _movementSpeed = 5;
     [SerializeField] private float _smoothTime = 0.1f;
     //Cedric
     [SerializeField] GameObject _Cedric;
     [SerializeField] bool _CAct;
+    [SerializeField] Transform _WipSensor;
+    [SerializeField] float _WipRange = 2;
+    private float SwingTimer;
+    private float SwingColdown = 0.5f;
+    private bool canSwing = true;
     //Thalya
     [SerializeField] GameObject _Thalya;
     [SerializeField] bool _TAct;
+    [SerializeField] Transform _shooter;
+    private float ShootTimer;
+    private float ShootColdown = 0.2f;
+    private bool canShoot = true;
     //Dash
     [SerializeField] private float _dashSpeed = 20;
     private bool _dashing = false;
@@ -32,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private bool _isChanging;
     private float _turnSmoothVelocity;
     private float targetAngle;
+    [SerializeField] LayerMask _enemyMask;
     //Gravity
     [SerializeField] private Transform _groundSensor;
     [SerializeField] private float _groundSensorRadius;
@@ -49,6 +60,8 @@ public class PlayerController : MonoBehaviour
         _lookAction = InputSystem.actions["Look"];
         _changeAction = InputSystem.actions["Change"];
         _dashAction = InputSystem.actions["Dash"];
+        _AttackAction = InputSystem.actions["Attack"];
+
     }
 
     #endregion
@@ -70,6 +83,10 @@ public class PlayerController : MonoBehaviour
         if(_dashAction.WasPressedThisFrame() && _dashing == false)
         {
             StartCoroutine(Dash());
+        }
+        if(_AttackAction.WasPressedThisFrame())
+        {
+            StartCoroutine(Attack());
         }
     }
 
@@ -178,6 +195,60 @@ public class PlayerController : MonoBehaviour
         _dashTimer = 0;
         _dashing = false;
     }
+
+    #endregion
+    #region BasicAttack
+
+    IEnumerator Attack()
+    {
+        if(_TAct && canShoot == true)
+        {
+            if(canShoot)
+            {
+                //GameObject bullet = PoolManager.Instance.GetPooledObject("BalasThalya", _shooter.position, _shooter.rotation);
+                //bullet.SetActive(true);
+                canShoot = false;
+            }
+
+            while (ShootTimer < ShootColdown)
+            {
+                ShootTimer += Time.deltaTime;
+                yield return null;
+            }
+
+            ShootTimer = 0;
+            canShoot = true;
+        }
+        else if(_CAct && canSwing == true)
+        {
+            canSwing = false;
+            Collider[] enemiesInRange = Physics.OverlapSphere(_WipSensor.position, _WipRange, _enemyMask);
+            foreach (Collider enemy in enemiesInRange)
+            {
+                IDamageable damageable = enemy.gameObject.GetComponent<IDamageable>();
+                if(damageable != null)
+                {
+                    damageable.TakeDamage(5);
+                }
+            }
+
+            while (SwingTimer < SwingColdown)
+            {   
+                SwingTimer += Time.deltaTime;
+                yield return null;
+            }
+
+            SwingTimer = 0;
+            canSwing = true;
+        }
+    }
+
+
+
+
+
+
+
 
     #endregion
 }
