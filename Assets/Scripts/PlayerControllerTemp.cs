@@ -6,8 +6,8 @@ public class PlayerControllerTemp : MonoBehaviour
 {
     //Componentes
     private CharacterController _controller;
-    [SerializeField] private CapsuleCollider _collider;
-    private Animator _animator;
+    [SerializeField] Animator _thalyaAnimator;
+    [SerializeField] Animator _cedricAnimator;
     //Inputs 
     private InputAction _moveAction;
     private InputAction _jumpAction;
@@ -104,7 +104,6 @@ public class PlayerControllerTemp : MonoBehaviour
         _SpecialAction = InputSystem.actions["SpecialAttack"];
         _UltiAction = InputSystem.actions["Ulti"];
         _mainCamera = Camera.main.transform;
-        _animator = GetComponentInChildren<Animator>();
     }
 
     void Start()
@@ -151,29 +150,28 @@ public class PlayerControllerTemp : MonoBehaviour
 
     void Movimiento()
     {
+        if(_ChicaActive)
+        {
+            _thalyaAnimator.SetFloat("Horizontal", _moveInput.x);
+            _thalyaAnimator.SetFloat("Vertical", _moveInput.y);
+        }
+        else if(_ChicoActive)
+        {
+            _cedricAnimator.SetFloat("Horizontal", _moveInput.x);
+            _cedricAnimator.SetFloat("Vertical", _moveInput.y);
+        }
         Vector3 direction = new Vector3(_moveInput.x, 0, _moveInput.y);
-
-        Ray ray = Camera.main.ScreenPointToRay(_lookInput);
-        RaycastHit hit;
 
         if(_C_UltiFinished != true)
         {
             return;
         }
-        else if (Physics.Raycast(ray, out hit, Mathf.Infinity))
-        {
-            Vector3 playerForward = hit.point - transform.position;
-            playerForward.y = 0;
-            transform.forward = playerForward;
-        }
 
-        if (direction != Vector3.zero)
-        {
-            _controller.Move(direction.normalized * _movementSpeed * Time.deltaTime);
-            targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, _smoothTime);
-            transform.rotation = Quaternion.Euler(0, smoothAngle, 0);
-        }
+        _controller.Move(direction.normalized * _movementSpeed * Time.deltaTime);
+        targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, _smoothTime);
+        transform.rotation = Quaternion.Euler(0, smoothAngle, 0);
+        
     }
 
     IEnumerator Attack()
