@@ -84,11 +84,14 @@ public class BasicEnemy : MonoBehaviour, IDamageable
         {
             currentSatate = EnemyState.Waiting;
         }
+        if(OnRange(_detectionRange))
+        {
+            _EnemyAgent.SetDestination(_player.position);
+        }
         if(OnRange(_damageArea))
         {
             currentSatate = EnemyState.Attacking;
         }
-        _EnemyAgent.SetDestination(_player.position);
     }
     
     void Attacking()

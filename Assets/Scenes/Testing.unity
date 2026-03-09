@@ -1141,7 +1141,7 @@ MonoBehaviour:
   _movementSpeed: 0
   _healthText: {fileID: 1838953895}
   _player: {fileID: 9166246014456747856}
-  _detectionRange: 6
+  _detectionRange: 10
   _damageArea: 2
   _playerMask:
     serializedVersion: 2
