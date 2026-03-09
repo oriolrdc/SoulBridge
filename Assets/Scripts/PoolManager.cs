@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class PoolManager : MonoBehaviour
 {
-    /*public static PoolManager Instance;
+    public static PoolManager Instance;
     [System.Serializable]
     public class Pool
     {
@@ -66,5 +66,5 @@ public class PoolManager : MonoBehaviour
 
         Debug.Log("No hay nada");
         return null;
-    }*/
+    }
 }

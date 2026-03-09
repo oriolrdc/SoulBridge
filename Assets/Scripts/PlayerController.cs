@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     #region Variables
     //Components
@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     //Stats
     [SerializeField] private float _movementSpeed = 5;
     [SerializeField] private float _smoothTime = 0.1f;
+    [SerializeField] private float _Health = 20;
     //Cedric
     [SerializeField] GameObject _Cedric;
     [SerializeField] bool _CAct;
@@ -31,7 +32,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool _TAct;
     [SerializeField] Transform _shooter;
     private float ShootTimer;
-    private float ShootColdown = 0.2f;
+    [SerializeField] private float ShootColdown = 0.2f;
     private bool canShoot = true;
     //Dash
     [SerializeField] private float _dashSpeed = 20;
@@ -197,26 +198,17 @@ public class PlayerController : MonoBehaviour
     }
 
     #endregion
+    //GameObject bullet = PoolManager.Instance.GetPooledObject("BalasThalya", _shooter.position, _shooter.rotation);
     #region BasicAttack
 
     IEnumerator Attack()
     {
         if(_TAct && canShoot == true)
         {
-            if(canShoot)
-            {
-                //GameObject bullet = PoolManager.Instance.GetPooledObject("BalasThalya", _shooter.position, _shooter.rotation);
-                //bullet.SetActive(true);
-                canShoot = false;
-            }
-
-            while (ShootTimer < ShootColdown)
-            {
-                ShootTimer += Time.deltaTime;
-                yield return null;
-            }
-
-            ShootTimer = 0;
+            canShoot = false;
+            GameObject bullet = PoolManager.Instance.GetPooledObject("BalasThalya", _shooter.position, _shooter.rotation);
+            bullet.SetActive(true);
+            yield return new WaitForSeconds(ShootColdown);
             canShoot = true;
         }
         else if(_CAct && canSwing == true)
@@ -241,6 +233,35 @@ public class PlayerController : MonoBehaviour
             SwingTimer = 0;
             canSwing = true;
         }
+        /*else if(_CAct)
+        {
+            canSwing = false;
+            Collider[] enemiesInRange = Physics.OverlapSphere(_WipSensor.position, _WipRange, _enemyMask);
+            foreach (Collider enemy in enemiesInRange)
+            {
+                IDamageable damageable = enemy.gameObject.GetComponent<IDamageable>();
+                if(damageable != null)
+                {
+                    damageable.TakeDamage(5);
+                }
+            }
+            yield return new WaitForSeconds(SwingColdown);
+            canSwing = true;
+        }*/
     }
     #endregion
+
+    public void TakeDamage(float damage)
+    {
+        _Health -= damage;
+        if(_Health <= 0)
+        {
+            Death();
+        }
+    }
+
+    void Death()
+    {
+        Destroy(gameObject);
+    }
 }

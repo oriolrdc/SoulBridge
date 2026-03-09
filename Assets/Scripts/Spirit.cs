@@ -5,7 +5,7 @@ public class Spirit : MonoBehaviour
 {   
     #region Variables
     NavMeshAgent _spiritAgent;
-    //[SerializeField] Transform _targetEnemy;
+    [SerializeField] Transform _targetEnemy;
     float _detectionRange = 2f;
     [SerializeField] float _damageArea;
     [SerializeField] LayerMask _enemyMask;
@@ -17,7 +17,7 @@ public class Spirit : MonoBehaviour
     void Awake()
     {
         _spiritAgent = GetComponent<NavMeshAgent>();
-        //_targetEnemy = GameObject.FindWithTag("Enemy").transform;
+        _targetEnemy = GameObject.FindWithTag("Enemy").transform;
     }
     #endregion
     #region SpiritStates

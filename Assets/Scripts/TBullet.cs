@@ -10,22 +10,20 @@ public class TBullet : MonoBehaviour
         _rbd = GetComponent<Rigidbody>();
     }
 
-    void Update()
+    void Start()
     {
-        _rbd.AddForce(transform.forward * _speed * Time.deltaTime, ForceMode.Impulse);
+        _rbd.AddForce(transform.forward * _speed, ForceMode.Impulse);
     }
 
     void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.layer != 6)
         {
-            Destroy(gameObject);
-            //gameObject.SetActive(false);
+            gameObject.SetActive(false);
         }
         else
         {
-            Destroy(gameObject);
-            //gameObject.SetActive(false);
+            gameObject.SetActive(false);
             IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
             if(damageable != null)
             {
@@ -36,7 +34,6 @@ public class TBullet : MonoBehaviour
 
     void OnBecameInvisible()
     {
-        Destroy(gameObject);
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 }
