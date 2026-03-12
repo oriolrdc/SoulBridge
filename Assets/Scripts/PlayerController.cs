@@ -201,7 +201,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     //GameObject bullet = PoolManager.Instance.GetPooledObject("BalasThalya", _shooter.position, _shooter.rotation);
     #region BasicAttack
 
-    IEnumerator Attack()
+    IEnumerator Attack() //Preguntar al victor pq va raro
     {
         if(_TAct && canShoot == true)
         {
@@ -264,4 +264,48 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         Destroy(gameObject);
     }
+
+
+
+
+
+
+
+
+[SerializeField] private float _attackRange = 10f; // Rango máximo de disparo
+[SerializeField] private float _stopDistance = 5f;  // La mitad (donde queremos que pare)
+[SerializeField] private float _moveSpeed = 4f;
+
+void Update()
+{
+    if (_playerTransform == null) return;
+
+    float distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
+
+    // LOGICA DE MOVIMIENTO
+    if (distanceToPlayer > _stopDistance) 
+    {
+        // Solo se mueve si está más lejos de la distancia de parada
+        MoverHaciaJugador();
+    }
+    // Si la distancia es menor o igual a _stopDistance, el enemigo se queda quieto.
+
+    // LOGICA DE ATAQUE (Independiente del movimiento)
+    if (distanceToPlayer <= _attackRange)
+    {
+        Attacking();
+        transform.LookAt(_playerTransform);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 }
