@@ -73,7 +73,7 @@
                     "name": "Sprint",
                     "type": "Button",
                     "id": "641cd816-40e6-41b4-8c3d-04687c349290",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -118,6 +118,15 @@
                     "name": "Hability",
                     "type": "Button",
                     "id": "24a30ac7-e833-47f1-81e9-a63bd80d095e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "199f79ba-1579-4532-8039-aea232835075",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -529,6 +538,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Hability",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "68c555b2-5e82-4da3-b1dd-d4f5130199ce",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

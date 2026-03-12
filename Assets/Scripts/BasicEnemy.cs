@@ -104,6 +104,7 @@ public class BasicEnemy : MonoBehaviour, IDamageable
         if(damageable != null)
         {
             damageable.TakeDamage(5);
+            Debug.Log("damage");
         }
     }
     
