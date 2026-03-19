@@ -2,43 +2,43 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 
-public class BasicEnemy : MonoBehaviour, IDamageable
+public class TechEnemy : MonoBehaviour, IDamageable
 {
     [SerializeField] CapsuleCollider _collider;
     [SerializeField] float _Health = 20;
     [SerializeField] float _movementSpeed;
-    [SerializeField] Text _healthText;
-    NavMeshAgent _EnemyAgent;
+    public Text _healthText;
+    UnityEngine.AI.NavMeshAgent _EnemyAgent;
     [SerializeField] Transform _player;
     [SerializeField] float _detectionRange;
-    [SerializeField] float _damageArea;
+    [SerializeField] float _attackArea;
     [SerializeField] LayerMask _playerMask;
     public EnemyState currentSatate;
-    private float attackCooldown = 1;
+    private float attackCooldown = 2;
     private float timer;
 
-
-    
     void Awake()
     {
         _EnemyAgent = GetComponent<NavMeshAgent>();
     }
-    
+
     public enum EnemyState
     {
         Waiting,
 
         Chasing,
 
-        Attacking
+        Attacking,
+
+        Retreat
     }
+
     void Start()
     {
+        _player = GameObject.FindWithTag("Player").transform;
         currentSatate = EnemyState.Chasing;
-        _healthText.text = "20";
-        timer = 1;
     }
-    
+
     void Update()
     {
         switch(currentSatate)
@@ -60,10 +60,11 @@ public class BasicEnemy : MonoBehaviour, IDamageable
             break;
         }
     }
-    
+
     bool OnRange(float distance)
     {
         float distanceToPlayer = Vector3.Distance(transform.position, _player.position);
+
         if(distanceToPlayer <= distance)
         {
             return true;
@@ -73,7 +74,7 @@ public class BasicEnemy : MonoBehaviour, IDamageable
             return false;
         }
     }
-    
+
     void Waiting()
     {
         if(_player != null)
@@ -81,7 +82,7 @@ public class BasicEnemy : MonoBehaviour, IDamageable
             currentSatate = EnemyState.Chasing;
         }
     }
-    
+
     void Chasing()
     {
         if(_player == null)
@@ -92,15 +93,15 @@ public class BasicEnemy : MonoBehaviour, IDamageable
         {
             _EnemyAgent.SetDestination(_player.position);
         }
-        if(OnRange(_damageArea))
+        if(OnRange(_attackArea))
         {
             currentSatate = EnemyState.Attacking;
         }
     }
-    
+
     void Attacking()
     {
-        if(!OnRange(_damageArea))
+        if(!OnRange(_attackArea))
         {
             currentSatate = EnemyState.Chasing;
         }
@@ -109,7 +110,7 @@ public class BasicEnemy : MonoBehaviour, IDamageable
         {
             if(timer >= attackCooldown)
             {
-                damageable.TakeDamage(5);
+                damageable.TakeDamage(10);
                 Debug.Log("damage");
                 timer = 0;
             }
@@ -118,8 +119,7 @@ public class BasicEnemy : MonoBehaviour, IDamageable
             
         }
     }
-    
-    
+
     public void TakeDamage(float damage)
     {
         _Health -= damage;
@@ -134,11 +134,11 @@ public class BasicEnemy : MonoBehaviour, IDamageable
     {
         Destroy(gameObject);
     }
-    
+
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, _damageArea);
+        Gizmos.DrawWireSphere(transform.position, _attackArea);
 
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, _detectionRange);

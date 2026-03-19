@@ -265,19 +265,17 @@ public class PlayerController : MonoBehaviour, IDamageable
         Destroy(gameObject);
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(_WipSensor.position, _WipRange);
+    }
+    /*[SerializeField] private float _attackRange = 10f; // Rango máximo de disparo
+    [SerializeField] private float _stopDistance = 5f;  // La mitad (donde queremos que pare)
+    [SerializeField] private float _moveSpeed = 4f;*/
 
-
-
-
-
-
-
-/*[SerializeField] private float _attackRange = 10f; // Rango máximo de disparo
-[SerializeField] private float _stopDistance = 5f;  // La mitad (donde queremos que pare)
-[SerializeField] private float _moveSpeed = 4f;*/
-
-/*void Update()
-{
+    /*void Update()
+    {
     if (_playerTransform == null) return;
 
     float distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
@@ -296,16 +294,5 @@ public class PlayerController : MonoBehaviour, IDamageable
         Attacking();
         transform.LookAt(_playerTransform);
     }
-}*/
-
-
-
-
-
-
-
-
-
-
-
+    }*/
 }
