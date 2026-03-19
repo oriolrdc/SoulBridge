@@ -272,11 +272,11 @@ public class PlayerController : MonoBehaviour, IDamageable
 
 
 
-[SerializeField] private float _attackRange = 10f; // Rango máximo de disparo
+/*[SerializeField] private float _attackRange = 10f; // Rango máximo de disparo
 [SerializeField] private float _stopDistance = 5f;  // La mitad (donde queremos que pare)
-[SerializeField] private float _moveSpeed = 4f;
+[SerializeField] private float _moveSpeed = 4f;*/
 
-void Update()
+/*void Update()
 {
     if (_playerTransform == null) return;
 
@@ -296,7 +296,7 @@ void Update()
         Attacking();
         transform.LookAt(_playerTransform);
     }
-}
+}*/
 
 
 

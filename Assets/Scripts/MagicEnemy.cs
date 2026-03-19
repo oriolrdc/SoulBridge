@@ -12,7 +12,7 @@ public class MagicEnemy : MonoBehaviour, IDamageable
     [SerializeField] Transform _player;
     [SerializeField] float _detectionRange;
     [SerializeField] float _damageArea;
-    [SerializeField] float _StopDistance;
+    [SerializeField] float _retreatDistance;
     [SerializeField] LayerMask _playerMask;
     public EnemyState currentSatate;
     private float attackCooldown = 1;
@@ -30,7 +30,9 @@ public class MagicEnemy : MonoBehaviour, IDamageable
 
         Chasing,
 
-        Attacking
+        Attacking,
+
+        Retreat
     }
 
     void Start()
@@ -57,6 +59,10 @@ public class MagicEnemy : MonoBehaviour, IDamageable
                 Attacking();
             break;
 
+            case EnemyState.Retreat:
+                Retreat();
+            break;
+
             default:
                 Chasing();
             break;
@@ -66,6 +72,7 @@ public class MagicEnemy : MonoBehaviour, IDamageable
     bool OnRange(float distance)
     {
         float distanceToPlayer = Vector3.Distance(transform.position, _player.position);
+
         if(distanceToPlayer <= distance)
         {
             return true;
@@ -85,78 +92,70 @@ public class MagicEnemy : MonoBehaviour, IDamageable
         }
     }
 
-    void Chasing()
-{
-    if (_player == null) 
+    void Retreat()
     {
-        currentSatate = EnemyState.Waiting;
-        return;
-    }
-    // 1. LÓGICA DE MOVIMIENTO
-    if (OnRange(_StopDistance)) 
-    {
-        // Ya llegó a su posición ideal de disparo: FRENAR
-        _EnemyAgent.isStopped = true;
-        _EnemyAgent.velocity = Vector3.zero;
-        return;
-    }
-    else if (OnRange(_detectionRange))
-    {
-        // Está lejos: PERSEGUIR
         _EnemyAgent.isStopped = false;
-        _EnemyAgent.SetDestination(_player.position);
-    }
+        if(!OnRange(_retreatDistance))
+        {
+            currentSatate = EnemyState.Chasing;
+        }
+        
+        Vector3 directionToPlayer = transform.position - _player.position;
+        Vector3 RetreatPoint = transform.position + directionToPlayer.normalized * 5f;
+        _EnemyAgent.SetDestination(RetreatPoint);
 
-    // 2. LÓGICA DE CAMBIO DE ESTADO (ATAQUE)
-    // Si la distancia es menor al área de daño, disparamos 
-    // (independientemente de si se está moviendo o no)
-    if (OnRange(_damageArea))
-    {
-        currentSatate = EnemyState.Attacking;
-    }
-}
-    /*void Chasing()
-    {
-        if(_player == null)
-        {
-            currentSatate = EnemyState.Waiting;
-        }
-        
-        if(OnRange(_StopDistance))
-        {
-            _EnemyAgent.isStopped = true;
-            _EnemyAgent.velocity = Vector3.zero;
-        }
-        else if(OnRange(_detectionRange))
-        {
-            _EnemyAgent.SetDestination(_player.position);
-        }
-        
-        if(OnRange(_damageArea))
+        if(transform.position == RetreatPoint)
         {
             currentSatate = EnemyState.Attacking;
         }
-    }*/
+    }
+
+    void Chasing()
+    {
+        _EnemyAgent.isStopped = false;
+
+        if (OnRange(_damageArea))
+        {
+            currentSatate = EnemyState.Attacking;
+        }
+
+        if (OnRange(_retreatDistance)) 
+        {
+            currentSatate = EnemyState.Retreat;
+        }
+        
+        if (OnRange(_detectionRange))
+        {
+            _EnemyAgent.SetDestination(_player.position);
+        }
+    }
 
     void Attacking()
     {
+        Vector3 direction = (_player.position - transform.position).normalized;
+        direction.y = 0; 
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+
+        if (OnRange(_retreatDistance)) 
+        {
+            currentSatate = EnemyState.Retreat;
+        }
+
         if(!OnRange(_damageArea))
         {
             currentSatate = EnemyState.Chasing;
             return;
         }
+
+        _EnemyAgent.isStopped = true;
              
         if(timer >= attackCooldown)
         {
-            /*GameObject bullet = PoolManager.Instance.GetPooledObject("BalasThalya", _shooter.position, _shooter.rotation);
-            IDamageable damageable = _player.gameObject.GetComponent<IDamageable>();
-            if(damageable != null)
-            {
-            
-                damageable.TakeDamage(5);
-                Debug.Log("damage");
-                timer = 0;
-            }*/
+            GameObject bullet = PoolManager.Instance.GetPooledObject("BalasEnemigos", _shooter.position, _shooter.rotation);
+            bullet.SetActive(true);
+            Debug.Log("shoot");
+            timer = 0;
         }
 
         timer += Time.deltaTime;
@@ -186,6 +185,6 @@ public class MagicEnemy : MonoBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, _detectionRange);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, _StopDistance);
+        Gizmos.DrawWireSphere(transform.position, _retreatDistance);
     }
 }
