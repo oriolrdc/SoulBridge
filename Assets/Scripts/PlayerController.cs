@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour, IDamageable
 {
@@ -18,7 +19,10 @@ public class PlayerController : MonoBehaviour, IDamageable
     //Stats
     [SerializeField] private float _movementSpeed = 5;
     [SerializeField] private float _smoothTime = 0.1f;
-    [SerializeField] private float _Health = 20;
+    [SerializeField] private float _Health;
+    [SerializeField] private float _maxHealth;
+    [SerializeField] private Image _HealthBar1;
+    [SerializeField] private Image _HealthBar2;
     //Cedric
     [SerializeField] GameObject _Cedric;
     [SerializeField] bool _CAct;
@@ -128,7 +132,24 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     void Movement()
     {
+        /*if(_ChicaActive)
+        {
+            _thalyaAnimator.SetFloat("Horizontal", _moveInput.x);
+            _thalyaAnimator.SetFloat("Vertical", _moveInput.y);
+        }
+        else if(_ChicoActive)
+        {
+            _cedricAnimator.SetFloat("Horizontal", _moveInput.x);
+            _cedricAnimator.SetFloat("Vertical", _moveInput.y);
+        }*/
         Vector3 direction = new Vector3(_moveInput.x, 0, _moveInput.y);
+
+        _controller.Move(direction.normalized * _movementSpeed * Time.deltaTime);
+        targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, _smoothTime);
+        transform.rotation = Quaternion.Euler(0, smoothAngle, 0);
+
+        /*Vector3 direction = new Vector3(_moveInput.x, 0, _moveInput.y);
 
         Ray ray = Camera.main.ScreenPointToRay(_lookInput);
         RaycastHit hit;
@@ -146,7 +167,7 @@ public class PlayerController : MonoBehaviour, IDamageable
             targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
             float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _turnSmoothVelocity, _smoothTime);
             transform.rotation = Quaternion.Euler(0, smoothAngle, 0);
-        }
+        }*/
     }
 
     #endregion
@@ -254,6 +275,10 @@ public class PlayerController : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         _Health -= damage;
+
+        _HealthBar1.fillAmount = _Health / _maxHealth;
+        _HealthBar2.fillAmount = _Health / _maxHealth;
+
         if(_Health <= 0)
         {
             Death();

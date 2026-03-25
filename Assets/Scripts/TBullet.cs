@@ -23,12 +23,12 @@ public class TBullet : MonoBehaviour
         }
         else
         {
-            gameObject.SetActive(false);
             IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
             if(damageable != null)
             {
                 damageable.TakeDamage(5);
             }
+            gameObject.SetActive(false);
         }
     }
 

@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using System.Collections;
 
-public class BasicEnemy : MonoBehaviour, IDamageable
+public class BasicEnemy : MonoBehaviour, IDamageable, IKnockbackable
 {
     [SerializeField] CapsuleCollider _collider;
+    [SerializeField] Rigidbody _rb;
     [SerializeField] float _Health = 20;
     [SerializeField] float _movementSpeed;
     [SerializeField] Text _healthText;
@@ -30,7 +32,9 @@ public class BasicEnemy : MonoBehaviour, IDamageable
 
         Chasing,
 
-        Attacking
+        Attacking,
+
+        Knockback
     }
     void Start()
     {
@@ -53,6 +57,10 @@ public class BasicEnemy : MonoBehaviour, IDamageable
 
             case EnemyState.Attacking:
                 Attacking();
+            break;
+
+            case EnemyState.Knockback:
+                StartCoroutine(GetKnockback());
             break;
 
             default:
@@ -118,6 +126,21 @@ public class BasicEnemy : MonoBehaviour, IDamageable
             
         }
     }
+
+    public IEnumerator GetKnockback() 
+    {
+        _EnemyAgent.enabled = false;
+        _rb.useGravity = true;
+        _rb.isKinematic = false;
+        _rb.AddForce(-transform.forward * 20, ForceMode.Impulse);
+
+        yield return new WaitForSeconds(0.5f);
+        _rb.linearVelocity = Vector3.zero;
+        _rb.useGravity = false;
+        _rb.isKinematic = true;
+        _EnemyAgent.enabled = true;
+        currentSatate = EnemyState.Chasing;
+    }
     
     
     public void TakeDamage(float damage)
@@ -128,6 +151,7 @@ public class BasicEnemy : MonoBehaviour, IDamageable
         {
             Death();
         }
+        currentSatate = EnemyState.Knockback;
     }
 
     void Death()
